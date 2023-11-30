@@ -1,0 +1,65 @@
+import tkinter as tk
+import random
+import time
+
+class SpeedTypingTest:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Speed Typing Test")
+        self.root.geometry("400x200")
+
+        self.words = ["python", "java", "programming", "code", "keyboard", "developer", "speed", "typing", "test"]
+
+        self.score = 0
+        self.time_start = 0
+        self.time_end = 0
+
+        self.word_label = tk.Label(root, text="", font=("Arial", 24))
+        self.word_label.pack(pady=20)
+
+        self.entry = tk.Entry(root, font=("Arial", 18))
+        self.entry.pack(pady=20)
+        self.entry.bind("<Return>", self.check_word)
+
+        self.start_button = tk.Button(root, text="Start", command=self.start_test)
+        self.start_button.pack()
+
+    def start_test(self):
+        self.score = 0
+        self.word_label.config(text="")
+        self.entry.delete(0, tk.END)
+        self.time_start = time.time()
+        self.generate_word()
+
+    def generate_word(self):
+        random.shuffle(self.words)
+        word = self.words[0]
+        self.word_label.config(text=word)
+
+    def check_word(self, event):
+        user_input = self.entry.get().strip().lower()
+        current_word = self.word_label.cget("text").lower()
+
+        if user_input == current_word:
+            self.score += 1
+            self.generate_word()
+            self.entry.delete(0, tk.END)
+
+        if self.score == 5:
+            self.end_test()
+
+    def end_test(self):
+        self.time_end = time.time()
+        elapsed_time = round(self.time_end - self.time_start, 2)
+        wpm = int((self.score / elapsed_time) * 60)
+
+        result_text = f"Test completed!\nYour WPM: {wpm}"
+        self.word_label.config(text=result_text)
+        self.entry.delete(0, tk.END)
+
+        self.start_button.config(text="Restart", command=self.start_test)
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = SpeedTypingTest(root)
+    root.mainloop()
